@@ -1,0 +1,87 @@
+<script runat="server" language="javascript">
+Platform.Load("Core","1.1");
+
+// Set Bet Text for Market Loop - change for different language
+var myMarketsDe = ["Wer gewinnt das Spiel?","Sieg (inkl. OT)","Wer gewinnt das Match?","Wer gewinnt das Spiel (inkl. OT)","Resultat","Siegwette"];
+
+
+//Function to check array
+  Array.includes = function(val,arr) {
+    for(z=0;z<arr.length;z++){
+       if (!ret || ret == false){ret = val == arr[z] ? true: false;}
+    }
+    return ret;
+  }
+
+
+//Set Feed Link
+var feedBaseUrl = "https://www.cashpoint.com/blog/ajax/salesforce/marketing-cloud/"
+var feedLanguage = "de"
+var feedBaseUrl2 = "/getGames/"
+var feedFilter = "sportId=2/7/daysinfuture=14"
+var feedUrl = feedBaseUrl.concat(feedLanguage,feedBaseUrl2,feedFilter);
+
+//Get Feed data
+var req = HTTP.Get(feedUrl);
+var obj = Platform.Function.ParseJSON(String(req.Content));
+var length = obj.length;
+var max = 10;
+
+
+for (i = 0; i < max; i++) {
+  //Set data
+  id = obj[i].id;
+  isTopGame = obj[i].isTopGame; 
+  team1 = obj[i].teams[0].name;
+  team2 = obj[i].teams[1].name;
+  startTime = obj[i].startTime;
+  type = obj[i].type;
+  leagueInfo = obj[i].leagueInfo.name;
+  leagueId = obj[i].leagueInfo.id;
+  team1TextId = obj[i].teams[0].textId;
+  team2TextId = obj[i].teams[1].textId;
+  markets = obj[i].markets.length;
+  sport = obj[i].sport;
+
+  //Loop through markets to fetch market type based on markets.text as position is not static
+  for (m = 0; m < markets; m++) {
+    betTextLoop = obj[i].markets[m].text;
+    if(Array.includes(betTextLoop,myMarketsDe)){
+      betText = obj[i].markets[0].text;
+      bet1Odd = obj[i].markets[0].tips[0].prettyOdd;
+      bet1Link = obj[i].markets[0].tips[0].deeplink;
+      bet2Odd = obj[i].markets[0].tips[1].prettyOdd;
+      bet2Link = obj[i].markets[0].tips[1].deeplink;
+      tip1id = obj[i].markets[0].tips[0].id;
+      tip2id = obj[i].markets[0].tips[1].id;
+    }
+  }
+
+
+
+  //Output for debug
+  Write("<br><br>ID" + i + ":" + id + "<br>");
+  Write("sport: "  + sport + "<br>");
+  Write("isTopGame: "  + isTopGame + "<br>");
+  Write("startTime: "  + startTime + "<br>");
+  Write("type: "  + type + "<br>");
+  Write("leagueInfo: "  + leagueInfo + "<br>");
+  Write("leagueId: "  + leagueId + "<br>");
+  Write("team1: "  + team1 + "<br>");
+  Write("team2: "  + team2 + "<br>");
+  Write("betText: "  + betText + "<br>");
+  Write("tip1id: "  + tip1id + "<br>");
+  Write("tip2id: "  + tip2id + "<br>");
+  Write("bet1Odd: "  + bet1Odd + "<br>");
+  Write("bet1Link: "  + bet1Link + "<br>");
+  Write("betXOdd: "  + betXOdd + "<br>");
+  Write("betXLink: "  + betXLink + "<br>");
+  Write("bet2Odd: "  + bet2Odd + "<br>");
+  Write("bet2Link: "  + bet2Link + "<br>");
+  Write("team1TextId: "  + team1TextId + "<br>");
+  Write("team2TextId: "  + team2TextId + "<br>");
+  Write("markets: "  + markets + "<br>");
+}
+  Write("<br>feedUrl: "  + feedUrl + "<br>");
+
+</script>
